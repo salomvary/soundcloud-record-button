@@ -1,5 +1,3 @@
-window.Promise = window.Promise || SC.Promise
-
 function View(el, props) {
   return Object.assign({
     show() {
@@ -16,9 +14,9 @@ function SignIn() {
   var oauthToken = localStorage.oauthToken
   var sessionUsername = localStorage.sessionUsername
 
-  var el = document.querySelector('.sign-in')
-  var username = el.querySelector('.username')
-  var signOutButton = el.querySelector('.sign-out')
+  const el = document.querySelector('.sign-in')
+  const username = el.querySelector('.username')
+  const signOutButton = el.querySelector('.sign-out')
 
   signOutButton.addEventListener('click', onSignOutClick, false)
 
@@ -88,18 +86,18 @@ function Timer() {
   var startTime
   var interval
 
-  var el = document.querySelector('time')
+  const el = document.querySelector('time')
 
   function pad(n) {
-    var s = ('00' + n)
+    const s = ('00' + n)
     return s.substr(s.length - 2)
   }
 
   function render() {
-    var time = new Date() - startTime
+    const time = new Date() - startTime
     if (startTime) {
-      var minutes = Math.floor(time / (60 * 1000))
-      var seconds = Math.floor(time % (60 * 1000) / 1000)
+      const minutes = Math.floor(time / (60 * 1000))
+      const seconds = Math.floor(time % (60 * 1000) / 1000)
       el.textContent = pad(minutes) + ':' + pad(seconds)
     } else {
       el.textContent = '00:00'
@@ -131,19 +129,19 @@ function Recorder({onDone}) {
   var recorder
   var recordingState = 'idle'
 
-  var el = document.querySelector('.recorder-screen')
-  var actions = el.querySelector('.actions')
-  var deleteButton = el.querySelector('.delete-button')
-  var nextButton = el.querySelector('.next-button')
-  var recordButton = el.querySelector('.record-button')
-  var statusMessage = el.querySelector('.status-message')
-  var title = el.querySelector('.title')
+  const el = document.querySelector('.recorder-screen')
+  const actions = el.querySelector('.actions')
+  const deleteButton = el.querySelector('.delete-button')
+  const nextButton = el.querySelector('.next-button')
+  const recordButton = el.querySelector('.record-button')
+  const statusMessage = el.querySelector('.status-message')
+  const title = el.querySelector('.title')
 
   deleteButton.addEventListener('click', reset, false)
   nextButton.addEventListener('click', onDone, false)
   recordButton.addEventListener('click', onRecordButtonClick, false)
 
-  var timer = Timer()
+  const timer = Timer()
 
   function blob() {
     return recorder.getWAV()
@@ -238,8 +236,8 @@ function Recorder({onDone}) {
 }
 
 function Uploader({onUploadSubmit, onDone}) {
-  var el = document.querySelector('.upload-screen')
-  var form = el.querySelector('form')
+  const el = document.querySelector('.upload-screen')
+  const form = el.querySelector('form')
 
   form.addEventListener('submit', onSubmit, false)
 
@@ -254,8 +252,8 @@ function Uploader({onUploadSubmit, onDone}) {
   }
 
   function upload(blob) {
-    var title = form.title.value
-    var sharing = form.sharing.value
+    const title = form.title.value
+    const sharing = form.sharing.value
     SC.upload({
       asset_data: blob,
       title: title.trim(),
@@ -270,9 +268,9 @@ function Uploader({onUploadSubmit, onDone}) {
 }
 
 function Done({onDone}) {
-  var el = document.querySelector('.done-screen')
-  var doneButton = el.querySelector('.done-button')
-  var trackTitle = el.querySelector('.track-title')
+  const el = document.querySelector('.done-screen')
+  const doneButton = el.querySelector('.done-button')
+  const trackTitle = el.querySelector('.track-title')
 
   doneButton.addEventListener('click', onDoneButtonClick, false)
 
@@ -293,10 +291,10 @@ function Done({onDone}) {
 }
 
 function App() {
-  var signIn = SignIn()
-  var recorder = Recorder({onDone: onRecorderDone})
-  var uploader = Uploader({onUploadSubmit: onUploadSubmit, onDone: onUploaderDone})
-  var done = Done({onDone: onDone})
+  const signIn = SignIn()
+  const recorder = Recorder({onDone: onRecorderDone})
+  const uploader = Uploader({onUploadSubmit: onUploadSubmit, onDone: onUploaderDone})
+  const done = Done({onDone: onDone})
 
   function onRecorderDone() {
     recorder.hide()
