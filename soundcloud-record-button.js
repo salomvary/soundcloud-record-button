@@ -1,3 +1,5 @@
+window.Promise = window.Promise || SC.Promise
+
 function View(el, props) {
   return Object.assign({
     show() {
@@ -14,9 +16,9 @@ function SignIn() {
   var oauthToken = localStorage.oauthToken
   var sessionUsername = localStorage.sessionUsername
 
-  const el = document.querySelector('.sign-in')
-  const username = el.querySelector('.username')
-  const signOutButton = el.querySelector('.sign-out')
+  var el = document.querySelector('.sign-in')
+  var username = el.querySelector('.username')
+  var signOutButton = el.querySelector('.sign-out')
 
   signOutButton.addEventListener('click', onSignOutClick, false)
 
@@ -86,18 +88,18 @@ function Timer() {
   var startTime
   var interval
 
-  const el = document.querySelector('time')
+  var el = document.querySelector('time')
 
   function pad(n) {
-    const s = ('00' + n)
+    var s = ('00' + n)
     return s.substr(s.length - 2)
   }
 
   function render() {
-    const time = new Date() - startTime
+    var time = new Date() - startTime
     if (startTime) {
-      const minutes = Math.floor(time / (60 * 1000))
-      const seconds = Math.floor(time % (60 * 1000) / 1000)
+      var minutes = Math.floor(time / (60 * 1000))
+      var seconds = Math.floor(time % (60 * 1000) / 1000)
       el.textContent = pad(minutes) + ':' + pad(seconds)
     } else {
       el.textContent = '00:00'
@@ -126,23 +128,22 @@ function Timer() {
 }
 
 function Recorder({onDone}) {
-  var empty = true
   var recorder
-  var recording
+  var recordingState = 'idle'
 
-  const el = document.querySelector('.recorder-screen')
-  const actions = el.querySelector('.actions')
-  const deleteButton = el.querySelector('.delete-button')
-  const nextButton = el.querySelector('.next-button')
-  const recordButton = el.querySelector('.record-button')
-  const statusMessage = el.querySelector('.status-message')
-  const title = el.querySelector('.title')
+  var el = document.querySelector('.recorder-screen')
+  var actions = el.querySelector('.actions')
+  var deleteButton = el.querySelector('.delete-button')
+  var nextButton = el.querySelector('.next-button')
+  var recordButton = el.querySelector('.record-button')
+  var statusMessage = el.querySelector('.status-message')
+  var title = el.querySelector('.title')
 
   deleteButton.addEventListener('click', reset, false)
   nextButton.addEventListener('click', onDone, false)
   recordButton.addEventListener('click', onRecordButtonClick, false)
 
-  const timer = Timer()
+  var timer = Timer()
 
   function blob() {
     return recorder.getWAV()
@@ -150,49 +151,83 @@ function Recorder({onDone}) {
 
   function onRecordButtonClick(event) {
     event.preventDefault()
-    empty = false
     if (!recorder) {
       recorder = new SC.Recorder()
     }
-    if (recording) {
-      recording = false
+    if (recordingState == 'recording') {
+      recordingState = 'paused'
       recorder.stop()
       timer.stop()
+    } else if (recordingState == 'idle' || recordingState == 'paused') {
+      recordingState = 'initializing'
+      recorder.start().then(onRecordingStart, onRecordingStartFail)
     } else {
-      recording = true
-      recorder.start()
-      timer.start()
+      throw new Error('Invalid recording state on button click: ' + recordingState)
     }
     render()
   }
 
+  function onRecordingStart() {
+    recordingState = 'recording'
+    timer.start()
+    render()
+  }
+
+  function onRecordingStartFail() {
+    recordingState = 'fail'
+    render()
+  }
+
   function render() {
-    if (empty) {
+    switch (recordingState) {
+    case 'idle':
+      statusMessage.textContent = 'Tap to start recording'
       actions.style.visibility = 'hidden'
       title.style.display = 'inline'
       timer.hide()
-    } else {
+      recordButton.disabled = false
+      recordButton.classList.remove('active-action-button')
+      break
+    case 'initializing':
+      statusMessage.textContent = 'Initializing microphone'
+      actions.style.visibility = 'hidden'
+      title.style.display = 'inline'
+      timer.hide()
+      recordButton.disabled = true
+      recordButton.classList.add('active-action-button')
+      break
+    case 'fail':
+      statusMessage.textContent = 'Failed to access microphone'
+      actions.style.visibility = 'visible'
+      title.style.display = 'inline'
+      timer.hide()
+      recordButton.disabled = false
+      recordButton.classList.remove('active-action-button')
+      break
+    case 'recording':
+      statusMessage.textContent = 'Tap to pause recording'
       actions.style.visibility = 'visible'
       title.style.display = 'none'
       timer.show()
-    }
-    if (recording) {
-      statusMessage.textContent = 'Tap to pause recording'
+      recordButton.disabled = false
       recordButton.classList.add('active-action-button')
-    } else {
-      if (empty) {
-        statusMessage.textContent = 'Tap to start recording'
-      } else {
-        statusMessage.textContent = 'Tap to continue recording'
-      }
+      break
+    case 'paused':
+      statusMessage.textContent = 'Tap to continue recording'
+      actions.style.visibility = 'visible'
+      title.style.display = 'none'
+      timer.show()
+      recordButton.disabled = false
       recordButton.classList.remove('active-action-button')
+      break
+    default:
+      throw new Error('Unexpected recording state ' + recordingState)
     }
   }
 
   function reset() {
     recorder = null
-    recording = false
-    empty = true
+    recordingState = 'idle'
     // https://github.com/soundcloud/soundcloud-javascript/issues/60
     try { recorder.delete() } catch(e) {}
     timer.reset()
@@ -203,8 +238,8 @@ function Recorder({onDone}) {
 }
 
 function Uploader({onUploadSubmit, onDone}) {
-  const el = document.querySelector('.upload-screen')
-  const form = el.querySelector('form')
+  var el = document.querySelector('.upload-screen')
+  var form = el.querySelector('form')
 
   form.addEventListener('submit', onSubmit, false)
 
@@ -219,8 +254,8 @@ function Uploader({onUploadSubmit, onDone}) {
   }
 
   function upload(blob) {
-    const title = form.title.value
-    const sharing = form.sharing.value
+    var title = form.title.value
+    var sharing = form.sharing.value
     SC.upload({
       asset_data: blob,
       title: title.trim(),
@@ -235,15 +270,19 @@ function Uploader({onUploadSubmit, onDone}) {
 }
 
 function Done({onDone}) {
-  const el = document.querySelector('.done-screen')
-  const doneButton = el.querySelector('.done-button')
-  const trackTitle = el.querySelector('.track-title')
+  var el = document.querySelector('.done-screen')
+  var doneButton = el.querySelector('.done-button')
+  var trackTitle = el.querySelector('.track-title')
 
   doneButton.addEventListener('click', onDoneButtonClick, false)
 
   function set(track) {
     trackTitle.textContent = track.title
-    trackTitle.href = track.permalink_url
+    var url = track.permalink_url
+    if (track.sharing == 'private') {
+      url += '/' + track.secret_token
+    }
+    trackTitle.href = url
   }
 
   function onDoneButtonClick() {
@@ -254,10 +293,10 @@ function Done({onDone}) {
 }
 
 function App() {
-  const signIn = SignIn()
-  const recorder = Recorder({onDone: onRecorderDone})
-  const uploader = Uploader({onUploadSubmit: onUploadSubmit, onDone: onUploaderDone})
-  const done = Done({onDone: onDone})
+  var signIn = SignIn()
+  var recorder = Recorder({onDone: onRecorderDone})
+  var uploader = Uploader({onUploadSubmit: onUploadSubmit, onDone: onUploaderDone})
+  var done = Done({onDone: onDone})
 
   function onRecorderDone() {
     recorder.hide()
