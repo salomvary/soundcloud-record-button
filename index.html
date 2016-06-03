@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <title>SoundCloud Record Button</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="soundcloud-record-button.css"/>
+  </head>
+  <body>
+    <header>
+      <p class="sign-in" style="display:none">
+        <span class="username"></span>
+        <a href="#" class="sign-out">sign out</a>
+      </p>
+    </header>
+
+    <div class="screen recorder-screen">
+      <h1>
+        <span class="title">Record</span>
+        <time style="display:none">00:00</time>
+      </h1>
+
+      <button class="action-button record-button">
+        <!-- https://design.google.com/icons/#ic_mic -->
+        <svg height="26" viewBox="0 0 24 24" width="26"
+          xmlns="http://www.w3.org/2000/svg" class="icon microphone-icon">
+          <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34
+            9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7
+            11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3
+            6-6.72h-1.7z"/>
+          <path d="M0 0h24v24H0z" fill="none"/>
+        </svg>
+      </button>
+
+      <p class="status-message">
+        Tap to start recording
+      </p>
+
+      <p class="actions" style="visibility:hidden">
+        <button class="flat-button delete-button">Delete</button>
+        <button class="flat-button next-button">Next</button>
+      </p>
+    </div>
+
+    <div class="screen upload-screen" style="display:none">
+      <h1>Upload</h1>
+      <form>
+        <p>
+          <label class="label" for="title">Track title:</label>
+          <input type="text" class="input" id="title" value="Sounds from Friday morning" required>
+        </p>
+        <p>
+          <span class="label">Track will be:</span>
+          <label>
+            <input type="radio" name="sharing" value="public" checked>
+            Public
+          </label>
+          <label>
+            <input type="radio" name="sharing" value="private">
+            Private
+          </label>
+        </p>
+        <button class="action-button upload-button">
+          <!-- https://design.google.com/icons/#ic_file_upload -->
+          <svg height="26" viewBox="0 0 24 24" width="26"
+            xmlns="http://www.w3.org/2000/svg" class="icon upload-icon">
+            <path d="M0 0h24v24H0z" fill="none"/>
+            <path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/>
+          </svg>
+        </button>
+      </form>
+      <p class="status-message">
+        Tap to post your recording
+      </p>
+    </div>
+
+    <div class="screen done-screen" style="display:none">
+      <p>
+        <a href="#" class="track-title">Sounds from Friday morning</a>
+      </p>
+      <button class="action-button done-button">
+        <!-- https://design.google.com/icons/#ic_done -->
+        <svg height="26" viewBox="0 0 24 24" width="26"
+          xmlns="http://www.w3.org/2000/svg" class="icon done-icon">
+          <path d="M0 0h24v24H0z" fill="none"/>
+          <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+        </svg>
+      </button>
+      <p class="status-message">
+        Upload finished
+      </p>
+    </div>
+
+    <script src="https://connect.soundcloud.com/sdk/sdk-3.1.1.js"></script>
+    <script src="config.js"></script>
+    <script src="soundcloud-record-button.js"></script>
+  </body>
+</html>
